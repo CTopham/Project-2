@@ -60,22 +60,18 @@ def tablebaby():
 
 @app.route("/scroll")
 def scroll():
-    return render_template("simple_pinning.html")
+    return render_template("lil_scroll.html")
 
 @app.route("/search")
 def baby():
     return render_template("babysearch.html")
-
 
 # Query the database and send the jsonified results
 @app.route("/send", methods=["GET", "POST"])
 def send():
     if request.method == "POST":
         name = request.form["findName"]
-        #lower_name=name.lower()
-        #pet = Pet(name=name, type=pet_type, age=age)
-        #db.session.add(pet)
-        #db.session.commit()
+
         years={"girls":[],"boys":[]}
         years["boys"] = db.session.query(Baby.Decade).filter(Baby.Males==name).all()
         years["girls"] = db.session.query(Baby.Decade).filter(Baby.Females==name).all()
@@ -110,43 +106,47 @@ def send():
                 #answer=years["boys"]
                 gender = "boy"
         
+
+        # Dependencies
+        import tweepy
+        import json
+
+        # Twitter API Keys
+        consumer_key = "Ed4RNulN1lp7AbOooHa9STCoU"
+        consumer_secret = "P7cUJlmJZq0VaCY0Jg7COliwQqzK0qYEyUF9Y0idx4ujb3ZlW5"
+        access_token = "839621358724198402-dzdOsx2WWHrSuBwyNUiqSEnTivHozAZ"
+        access_token_secret = "dCZ80uNRbFDjxdU2EckmNiSckdoATach6Q8zb7YYYE5ER"
+
+        # Setup Tweepy API Authentication
+        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+        auth.set_access_token(access_token, access_token_secret)
+        api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
+
+        # Search Term
+        search_term = name
+
+        # Search for all tweets
+        public_tweets = api.search(search_term, rpp=1)
+        # View Search Object
+
+        tweeting_name=""
+        tweeting_name = public_tweets["statuses"][0]["text"]
         
-        #return render_template('index.html', {'boys': years["boys"],'girls': years["girls"]})
-        #return render_template("http://localhost:5000/", {'boys': years["boys"],'girls': years["girls"]})
-        #return redirect("http://localhost:5000/", code=302)
-        #return redirect("index.html", code=302)
-        #return redirect("http://localhost:5000/", {'boys': years["boys"],'girls': years["girls"]})
+        a = api.get_status(int(public_tweets["statuses"][0]['id']), tweet_mode='extended')
+
+        link = ""
+        if(public_tweets["statuses"][0].get('entities').get('urls')):
+            url = public_tweets["statuses"][0].get('entities').get('urls')[0]['url']
+            link = "Find more info at "+url
+            #print(link)
+
         
-        #return render_template('index.html', name=name, boys=years["boys"], girls=years["girls"])
-        return render_template('babysearch.html', name=name, answer=answer, gender = gender)
+        return render_template('babysearch.html', name=name, answer=answer, gender = gender, tweeting_name=a['full_text'],additional=link)
 
 #This part said render form.html in the pet pals thing
     return render_template("babysearch.html")
-    #return render_template('index.html', {'boys': years["boys"],'girls': years["girls"]})
+    #return render_template('babysearch.html', {'boys': years["boys"],'girls': years["girls"]})
 
-
-# @app.route("/api/pals")
-# def pals():
-#     results = db.session.query(Pet.type, func.count(Pet.type)).group_by(Pet.type).all()
-
-#     pet_type = [result[0] for result in results]
-#     age = [result[1] for result in results]
-
-#     pet_data = {
-#         "x": pet_type,
-#         "y": age,
-#         "type": "bar"
-#     }
-
-#     return jsonify(pet_data)
-
-
-# @app.route("/api/names")
-# def pets():
-#     results = db.session.query(Pet.name).all()
-#     print(results)
-#     all_pets = list(np.ravel(results))
-#     return jsonify(all_pets)
 
 if __name__ == "__main__":
     app.run()

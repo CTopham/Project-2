@@ -13,19 +13,12 @@ var $FemaleInput = document.querySelector("#Female");
 var $DecadeInput = document.querySelector("#Decade"); 
 
 
-// Search Button variable defintion
-var $searchBtn = document.querySelector("#search"); // Variable to call Search Button function in our HTML
+
+// var $searchBtn = document.querySelector("#search"); 
+// $searchBtn.addEventListener("click", handleSearchButtonClick);
 
 
-//---------------------------------------------------------------------------------------------
-// SECTION 2 - Defining event listeners for handling search button clicks and for handling a user pressing an 'enter' key...
 
-// Add an event listener to the searchButton, call handleSearchButtonClick when clicked
-// handleSearchButtonClick function has all the logic for searching our table with the exact data elements we want to render
-$searchBtn.addEventListener("click", handleSearchButtonClick);
-
-// Add an event listener to initiate a search (by kicking off handleSearchButtonClick() function by just pressing the 'enter' key :)
-// Just a shortcut for quicker search results where you don't have to 'click' on the search button everytime...
 document.addEventListener('keypress', function (e) {
   var key = e.which || e.keyCode;
   if (key === 13) { // 13 is enter
